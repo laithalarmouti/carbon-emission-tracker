@@ -1,0 +1,3 @@
+Energy 11436.5
+Waste 4512
+Travel 7218.75

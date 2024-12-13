@@ -1,0 +1,13 @@
+Electricity Bill: 500 euros
+Gas Bill: 300 euros
+Fuel Bill: 410 euros
+Waste Generated: 800 kg
+Waste Recycled Percentage: 10%
+Kilometers Traveled: 25000 km
+Fuel Efficiency: 8 liters/100 km
+---------------------------------
+Energy Usage Emissions: 11436.5 kgCO2/year
+Waste Emissions: 4512 kgCO2/year
+Business Travel Emissions: 7218.75 kgCO2/year
+---------------------------------
+Total Carbon Footprint: 23167.2 kgCO2/year
