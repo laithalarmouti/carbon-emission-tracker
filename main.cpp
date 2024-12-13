@@ -1,9 +1,10 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <iomanip>
 #include <vector>
 #include <cstdlib>
-#include <iomanip>
+#include<sstream>
 #include <limits>
 
 using namespace std;
@@ -52,7 +53,7 @@ int main() {
         calculateData(data); 
         giveSuggestions(data); 
 
-        // Collecting emission data for plotting
+        // Collecting emission data for plotting and placing in vector
         vector<double> emissions = {
             (data.electricityBill * 12 * 0.0005) + (data.gasBill * 12 * 0.0053) + (data.fuelBill * 12 * 2.32),
             data.wasteGenerated * 12 * (0.57 - (data.wasteRecycledPercentage / 100.0)),
@@ -156,6 +157,44 @@ void saveData(const CarbonData& data, const string& filename) {
     outFile.close();
 }
 
+
+//loading data from example_carbon_data.txt and saving it temporarly on emissions_data.txt for plotting.
+CarbonData loadData(const std::string& filename) {
+    std::ifstream inFile(filename);
+    if (!inFile) {
+        throw std::runtime_error("Error opening the file.");
+    }
+
+    CarbonData data;
+    std::string line;
+
+    // Read and parse each line to extract the numbers only from report
+    std::getline(inFile, line);
+    std::istringstream(line.substr(line.find(":") + 1)) >> data.electricityBill;
+
+    std::getline(inFile, line);
+    std::istringstream(line.substr(line.find(":") + 1)) >> data.gasBill;
+
+    std::getline(inFile, line);
+    std::istringstream(line.substr(line.find(":") + 1)) >> data.fuelBill;
+
+    std::getline(inFile, line);
+    std::istringstream(line.substr(line.find(":") + 1)) >> data.wasteGenerated;
+
+    std::getline(inFile, line);
+    std::istringstream(line.substr(line.find(":") + 1)) >> data.wasteRecycledPercentage;
+
+    std::getline(inFile, line);
+    std::istringstream(line.substr(line.find(":") + 1)) >> data.kilometersTraveled;
+
+    std::getline(inFile, line);
+    std::istringstream(line.substr(line.find(":") + 1)) >> data.fuelEfficiency;
+
+    inFile.close();
+    return data;
+}
+
+
 //calculations
 void calculateData(const CarbonData& data) {
     double energyCO2 = (data.electricityBill*12*0.0005) +
@@ -210,3 +249,22 @@ void giveSuggestions(const CarbonData& data) {
     cout << "---------------------------------\n";
 }
 
+void plotCarbonEmissions(const vector<double>& emissions) {
+    // Create a txt file store temp data, which will be overwritten
+    ofstream dataFile("emissions_data.txt");
+    dataFile << "Energy " << emissions[0] << endl;
+    dataFile << "Waste " << emissions[1] << endl;
+    dataFile << "Travel " << emissions[2] << endl;
+    dataFile.close();
+
+//plotting to gnuplot
+    system("gnuplot -e \"set title 'Carbon Emissions'; \
+                        set xlabel 'Category'; \
+                        set ylabel 'Emissions (kgCO2)'; \
+                        set style data histograms; \
+                        set style fill solid 1.0; \
+                        set boxwidth 0.5; \
+                        set xtics rotate by -45; \
+                        plot 'emissions_data.txt' using 2:xtic(1) with boxes lc rgb 'blue' title 'Emissions'; \
+                        pause -1\"");
+}
