@@ -155,3 +155,58 @@ void saveData(const CarbonData& data, const string& filename) {
 
     outFile.close();
 }
+
+//calculations
+void calculateData(const CarbonData& data) {
+    double energyCO2 = (data.electricityBill*12*0.0005) +
+                       (data.gasBill*12*0.0053) +
+                       (data.fuelBill*12*2.32);
+    //Equation given returns negative values if recycling percentage is above 57? 
+    //tried flooring rounding to 0 if it goes below 0, messed up the plotting part.
+    double wasteCO2 = data.wasteGenerated*12*(0.57-(data.wasteRecycledPercentage/100.0));
+    double travelCO2 = data.kilometersTraveled * (1.0 / data.fuelEfficiency) * 2.31;
+
+
+    double totalCO2 = energyCO2 + wasteCO2 + travelCO2;
+
+    //Report
+    cout << fixed << setprecision(2);
+    cout << "\nCarbon Footprint Report:\n";
+    cout << "---------------------------------\n";
+    cout << "Energy Usage Emissions: " << energyCO2 << " kgCO2/year\n";
+    cout << "Waste Emissions: " << wasteCO2 << " kgCO2/year\n";
+    cout << "Business Travel Emissions: " << travelCO2 << " kgCO2/year\n";
+    cout << "-----------------------------\n";
+    cout << "Total Carbon Footprint: " << totalCO2 << " kgCO2/year\n";
+}
+
+
+// Suggestions
+void giveSuggestions(const CarbonData& data) {
+    cout << "\nSuggestions to Reduce Carbon Emissions:\n";
+    cout << "---------------------------------\n";
+
+    double energyCO2 = (data.electricityBill * 12 * 0.0005) +
+                       (data.gasBill * 12 * 0.0053) +
+                       (data.fuelBill * 12 * 2.32);
+    double wasteCO2 = data.wasteGenerated * 12 * (0.57 - (data.wasteRecycledPercentage / 100.0));
+    double travelCO2 = data.kilometersTraveled * (1.0 / data.fuelEfficiency) * 2.31;
+
+    if (energyCO2 > wasteCO2 && energyCO2 > travelCO2) {
+        cout << "- Consider installing energy-efficient appliances and using renewable energy sources like solar panels.\n";
+        cout << "- Implement energy-saving practices such as turning off unused equipment and optimizing heating/cooling systems.\n";
+    }
+
+    if (wasteCO2 > energyCO2 && wasteCO2 > travelCO2) {
+        cout << "- Increase the percentage of waste recycled or composted.\n";
+        cout << "- Reduce waste generation by adopting reusable materials and improving waste management practices.\n";
+    }
+
+    if (travelCO2 > energyCO2 && travelCO2 > wasteCO2) {
+        cout << "- Use fuel-efficient vehicles, such as hybrids or electric cars, for business travel.\n";
+        cout << "- Optimize travel routes to minimize distance and adopt carpooling practices.\n";
+    }
+
+    cout << "---------------------------------\n";
+}
+
